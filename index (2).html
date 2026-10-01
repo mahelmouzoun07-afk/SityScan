@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>ScanTaVille · Les commerces sans site web de ta ville</title>
+  <meta name="description" content="Tape ta ville : chaque commerce sans site web apparaît sur la carte. Clique, son site est déjà fait. Il ne reste qu'à le vendre." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Schibsted+Grotesk:wght@400;600&family=Martian+Mono&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <header class="topbar">
+    <a href="/" class="logo">scan<strong>ta</strong>ville</a>
+    <nav>
+      <button id="btn-autre-ville">Autre ville</button>
+      <button id="btn-mode-tournage">Mode tournage</button>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>Vends des sites <em>aux commerces</em> de ta ville.</h1>
+    <p>Ils n'ont pas de site. Le leur est déjà prêt.</p>
+    <button id="btn-commencer" class="cta">Commencer mon business →</button>
+  </section>
+
+  <section id="recherche-ville" class="ecran-plein" hidden>
+    <button id="btn-fermer-recherche" class="btn-fermer" aria-label="Fermer">✕</button>
+    <h2>Dans quelle ville ?</h2>
+    <input
+      type="text"
+      id="input-ville"
+      placeholder="Tape le nom de ta ville…"
+      autocomplete="off"
+    />
+    <ul id="liste-suggestions"></ul>
+    <p id="message-recherche" class="message-discret"></p>
+  </section>
+
+  <section id="map-section">
+    <div id="map"></div>
+    <div class="compteur">
+      <span id="count-total">0</span> commerces <em>sans site web référencé</em>
+      <div class="detail">
+        <span id="count-aucun">0</span> aucun site détecté
+        <span id="count-social">0</span> Insta / Facebook seulement
+      </div>
+    </div>
+  </section>
+
+  <section class="faq">
+    <h2>Questions</h2>
+
+    <details>
+      <summary>C'est quoi ScanTaVille ?</summary>
+      <p>Tu tapes ta ville, on te montre les commerces qui n'ont pas de site web. Pour chacun, une maquette de site est déjà prête : tu la montres au patron et tu lui vends.</p>
+    </details>
+
+    <details>
+      <summary>Je dois savoir coder ?</summary>
+      <p>Non. La maquette se génère toute seule avec le nom, l'adresse, les horaires et le téléphone du commerce. Tu peux modifier les textes et ajouter des photos en quelques clics.</p>
+    </details>
+
+    <details>
+      <summary>Comment je trouve mes premiers clients ?</summary>
+      <p>Tu passes en boutique avec ton téléphone ou tu envoies le lien en DM WhatsApp : « Je vous ai déjà fait votre site, regardez. » Les scripts et les réponses aux objections sont fournis.</p>
+    </details>
+
+    <details>
+      <summary>Combien je peux vendre un site ?</summary>
+      <p>C'est toi qui fixes ton prix. Pour un site vitrine de commerce, le prix conseillé est <strong>70 000 FCFA</strong>. Aucun revenu n'est garanti : ça dépend de toi et du nombre de commerces que tu contactes.</p>
+    </details>
+
+    <details>
+      <summary>Il me faut un statut ?</summary>
+      <p>Oui, pour facturer il te faut un statut légal reconnu dans ton pays. Le générateur de devis et de factures est intégré.</p>
+    </details>
+
+    <details>
+      <summary>C'est gratuit ?</summary>
+      <p>Le scan de ta ville est gratuit. Pour voir les commerces et générer leurs sites, il faut une formule : Essentiel, Pro ou Illimité.</p>
+    </details>
+
+    <details>
+      <summary>Ça marche dans ma ville ?</summary>
+      <p>Partout en Afrique de l'Ouest.</p>
+    </details>
+  </section>
+
+  <footer>
+    <p>Aucun revenu garanti · <a href="mailto:contact@scantaville.africa">Commerçant ? Retirer ma fiche</a></p>
+    <p>© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">contributeurs OpenStreetMap</a> (ODbL) · Chaque commerce est « à vérifier » avant contact.</p>
+  </footer>
+
+  <script src="https://unpkg.com/maplibre-gl@4/dist/maplibre-gl.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
