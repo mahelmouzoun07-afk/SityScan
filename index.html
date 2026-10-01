@@ -17,8 +17,34 @@
     <nav>
       <button id="btn-autre-ville">Autre ville</button>
       <button id="btn-mode-tournage">Mode tournage</button>
+      <button id="btn-compte">Mon compte</button>
     </nav>
   </header>
+
+  <section id="ecran-compte" class="ecran-plein" hidden>
+    <button id="btn-fermer-compte" class="btn-fermer" aria-label="Fermer">✕</button>
+
+    <div id="vue-connexion">
+      <h2>Mon compte</h2>
+      <form id="form-connexion">
+        <input
+          type="email"
+          id="input-email-connexion"
+          placeholder="ton@email.com"
+          autocomplete="email"
+          required
+        />
+        <button type="submit" class="cta">Recevoir le lien de connexion</button>
+      </form>
+      <p id="message-connexion" class="message-discret"></p>
+    </div>
+
+    <div id="vue-connecte" hidden>
+      <h2>Connecté</h2>
+      <p id="email-connecte" class="message-discret"></p>
+      <button id="btn-deconnexion" class="cta">Se déconnecter</button>
+    </div>
+  </section>
 
   <section class="hero">
     <h1>Vends des sites <em>aux commerces</em> de ta ville.</h1>

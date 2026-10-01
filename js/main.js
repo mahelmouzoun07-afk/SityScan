@@ -2,8 +2,11 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./config/supabase.js";
 import { initRechercheVille } from "./city.js";
 import { lancerScan } from "./scan.js";
+import { initAuth } from "./auth.js";
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+initAuth();
 
 const map = new maplibregl.Map({
   container: "map",

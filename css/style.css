@@ -254,3 +254,28 @@ footer a {
   background: #c3c9d6;
   opacity: 0.6;
 }
+
+#form-connexion {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 360px;
+}
+
+#input-email-connexion {
+  padding: 14px 18px;
+  font-size: 1rem;
+  border: 2px solid var(--marine);
+  border-radius: 30px;
+  font-family: var(--font-texte);
+}
+
+#input-email-connexion:focus {
+  outline: none;
+  border-color: var(--bleu);
+}
+
+#vue-connecte {
+  text-align: center;
+}
