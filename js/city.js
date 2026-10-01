@@ -6,24 +6,14 @@ let villesChargees = false;
 async function chargerVilles() {
   if (villesChargees) return villesDisponibles;
 
-  const { data, error } = await supabase
-    .from("commerces")
-    .select("ville, pays");
+  const { data, error } = await supabase.rpc("villes_disponibles");
 
   if (error) {
     console.error("Erreur chargement villes :", error);
     return [];
   }
 
-  const vues = new Map();
-  for (const row of data) {
-    if (!row.ville) continue;
-    if (!vues.has(row.ville)) {
-      vues.set(row.ville, row.pays || "");
-    }
-  }
-
-  villesDisponibles = Array.from(vues.entries()).map(([ville, pays]) => ({ ville, pays }));
+  villesDisponibles = data || [];
   villesChargees = true;
   return villesDisponibles;
 }

@@ -19,14 +19,18 @@ function centreEtZoom(commerces) {
 
 function creerMarker(map, commerce) {
   const el = document.createElement("div");
-  el.className = commerce.a_un_site ? "marker marker-avec-site" : "marker marker-sans-site";
+  el.className = commerce.locked
+    ? "marker marker-verrouille"
+    : commerce.a_un_site
+      ? "marker marker-avec-site"
+      : "marker marker-sans-site";
   el.title = commerce.nom;
 
-  const popup = new maplibregl.Popup({ offset: 12 }).setHTML(`
-    <strong>${commerce.nom}</strong><br/>
-    ${commerce.metier_label || ""}<br/>
-    ${commerce.quartier || ""}
-  `);
+  const contenuPopup = commerce.locked
+    ? `<strong>${commerce.nom}</strong><br/>${commerce.metier_label || ""}<br/><em>Débloque ce commerce avec un abonnement</em>`
+    : `<strong>${commerce.nom}</strong><br/>${commerce.metier_label || ""}<br/>${commerce.quartier || ""}${commerce.telephone ? `<br/>${commerce.telephone}` : ""}`;
+
+  const popup = new maplibregl.Popup({ offset: 12 }).setHTML(contenuPopup);
 
   return new maplibregl.Marker({ element: el })
     .setLngLat([commerce.longitude, commerce.latitude])
@@ -37,10 +41,7 @@ function creerMarker(map, commerce) {
 export async function lancerScan(map, ville) {
   viderMarkers();
 
-  const { data: commerces, error } = await supabase
-    .from("commerces")
-    .select("id, nom, metier_label, quartier, latitude, longitude, a_un_site")
-    .eq("ville", ville);
+  const { data: commerces, error } = await supabase.rpc("commerces_ville", { p_ville: ville });
 
   if (error) {
     console.error("Erreur chargement commerces :", error);

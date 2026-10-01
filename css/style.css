@@ -249,3 +249,8 @@ footer a {
 .marker-avec-site {
   background: #9aa3b8;
 }
+
+.marker-verrouille {
+  background: #c3c9d6;
+  opacity: 0.6;
+}
