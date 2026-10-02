@@ -1,7 +1,13 @@
 import { supabase } from "./main.js";
 import { creerBrume } from "./fog.js";
+import { ouvrirFicheCommerce } from "./fiche.js";
 
 let markersActuels = [];
+let onGenererSiteCallback = null;
+
+export function definirGestionGenererSite(callback) {
+  onGenererSiteCallback = callback;
+}
 
 function viderMarkers() {
   for (const m of markersActuels) m.remove();
@@ -26,15 +32,15 @@ function creerMarker(map, commerce) {
       : "marker marker-sans-site";
   el.title = commerce.nom;
 
-  const contenuPopup = commerce.locked
-    ? `<strong>${commerce.nom}</strong><br/>${commerce.metier_label || ""}<br/><em>Débloque ce commerce avec un abonnement</em>`
-    : `<strong>${commerce.nom}</strong><br/>${commerce.metier_label || ""}<br/>${commerce.quartier || ""}${commerce.telephone ? `<br/>${commerce.telephone}` : ""}`;
-
-  const popup = new maplibregl.Popup({ offset: 12 }).setHTML(contenuPopup);
+  el.addEventListener("click", (e) => {
+    e.stopPropagation();
+    ouvrirFicheCommerce(commerce, {
+      onGenererSite: (c) => onGenererSiteCallback && onGenererSiteCallback(c),
+    });
+  });
 
   return new maplibregl.Marker({ element: el })
     .setLngLat([commerce.longitude, commerce.latitude])
-    .setPopup(popup)
     .addTo(map);
 }
 

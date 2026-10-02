@@ -279,3 +279,49 @@ footer a {
 #vue-connecte {
   text-align: center;
 }
+
+#fiche-contenu {
+  width: 100%;
+  max-width: 440px;
+  text-align: left;
+}
+
+#fiche-contenu h2 {
+  font-family: var(--font-titre);
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+#fiche-contenu p {
+  margin: 10px 0;
+  line-height: 1.5;
+}
+
+#fiche-contenu a {
+  color: var(--bleu);
+}
+
+.fiche-verrou {
+  background: #f2f5ff;
+  border-radius: 12px;
+  padding: 14px;
+  color: var(--marine);
+}
+
+.fiche-statut-label {
+  display: block;
+  margin: 16px 0;
+  font-size: 0.9rem;
+  color: #4a5670;
+}
+
+.fiche-statut-label select {
+  display: block;
+  margin-top: 6px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid var(--marine);
+  border-radius: 20px;
+  font-family: var(--font-texte);
+  font-size: 1rem;
+}
