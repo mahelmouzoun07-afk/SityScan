@@ -5,10 +5,12 @@ import { lancerScan, definirGestionGenererSite } from "./scan.js";
 import { initAuth } from "./auth.js";
 import { initFicheCommerce, getCommerceOuvert } from "./fiche.js";
 import { mettreAJourStatut } from "./prospection.js";
+import { ouvrirGenerateur, initGenerateur } from "./generateur.js";
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 initAuth();
+initGenerateur();
 
 const map = new maplibregl.Map({
   container: "map",
@@ -36,7 +38,8 @@ initFicheCommerce({
 });
 
 definirGestionGenererSite((commerce) => {
-  alert(`Génération de la maquette pour "${commerce.nom}" — fonctionnalité à construire ensuite.`);
+  document.getElementById("fiche-commerce").hidden = true;
+  ouvrirGenerateur(commerce);
 });
 
 initRechercheVille({

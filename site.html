@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Site généré</title>
+</head>
+<body>
+  <script type="module">
+    import { decoderMaquetteDepuisUrl, rendreHtmlMaquette } from "./js/maquette.js";
+
+    const encode = window.location.hash.slice(1);
+    if (!encode) {
+      document.body.textContent = "Aucune maquette à afficher.";
+    } else {
+      try {
+        const donnees = decoderMaquetteDepuisUrl(encode);
+        document.open();
+        document.write(rendreHtmlMaquette(donnees));
+        document.close();
+      } catch (e) {
+        document.body.textContent = "Lien invalide ou corrompu.";
+      }
+    }
+  </script>
+</body>
+</html>
