@@ -1,6 +1,7 @@
 import { ACCROCHES, PALETTES, hashSimple, remplacerVariables } from "./maquette.js";
 import { photosDuSecteur } from "./photos.js";
 import { STYLE_ANIMATIONS, SCRIPT_ANIMATIONS } from "./animations.js";
+import { featuresDeLaFamille, TEMOIGNAGES_GENERIQUES, FAQ_GENERIQUE } from "./contenu-generique.js";
 
 export function slugifier(texte) {
   return texte
@@ -17,133 +18,145 @@ function styleEtAccroche(commerce, familleId, seed) {
   return { palette, accroche };
 }
 
-function entete(commerce, pages, pageActuelle, palette) {
+function lienWhatsapp(commerce) {
+  return commerce.telephone ? `https://wa.me/${commerce.telephone.replace(/[^0-9]/g, "")}` : null;
+}
+
+// --- Composants partagés ---
+
+function entete(commerce, pages, pageActuelle) {
   const liens = pages
     .map((p) => `<a href="${slugifier(p)}.html" class="${p === pageActuelle ? 'actif' : ''}">${p}</a>`)
     .join("");
+  const wa = lienWhatsapp(commerce);
   return `
-  <header class="entete">
+  <header class="entete-sticky">
     <a href="accueil.html" class="logo">${commerce.nom}</a>
     <nav class="nav-pages">${liens}</nav>
+    ${wa ? `<a href="${wa}" target="_blank" rel="noopener" class="bouton-wa-entete">WhatsApp</a>` : ""}
   </header>`;
 }
 
-function pied(commerce, palette) {
-  const lienWhatsapp = commerce.telephone
-    ? `https://wa.me/${commerce.telephone.replace(/[^0-9]/g, "")}`
-    : null;
+function boutonWhatsappFlottant(commerce) {
+  const wa = lienWhatsapp(commerce);
+  return wa ? `<a href="${wa}" target="_blank" rel="noopener" class="wa-flottant" aria-label="WhatsApp">💬</a>` : "";
+}
+
+function pied(commerce) {
+  const wa = lienWhatsapp(commerce);
   return `
   <footer class="pied">
-    <p>${commerce.nom} · ${commerce.adresse || commerce.quartier || ""}</p>
-    ${lienWhatsapp ? `<a href="${lienWhatsapp}" target="_blank" rel="noopener" class="bouton-wa">Écrire sur WhatsApp</a>` : ""}
+    <div class="pied-colonnes">
+      <div>
+        <strong>${commerce.nom}</strong>
+        <p>${commerce.adresse || ""}</p>
+        <p>${commerce.quartier || ""}, ${commerce.ville || ""}</p>
+      </div>
+      <div>
+        <strong>Contact</strong>
+        ${commerce.telephone ? `<p>${commerce.telephone}</p>` : ""}
+        ${wa ? `<a href="${wa}" target="_blank" rel="noopener">Écrire sur WhatsApp</a>` : ""}
+      </div>
+      <div>
+        <strong>Suivez-nous</strong>
+        <p>Réseaux sociaux à ajouter</p>
+      </div>
+    </div>
     <p class="mention">Site généré avec SityScan</p>
   </footer>`;
 }
 
-function enveloppe({ titrePage, commerce, pages, pageActuelle, palette, corps }) {
-  return `<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>${titrePage} — ${commerce.nom}</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Schibsted Grotesk', Arial, sans-serif; background: ${palette.fond}; color: ${palette.texte}; }
-  a { color: inherit; }
-  .entete { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; flex-wrap: wrap; gap: 8px; }
-  .logo { font-weight: 800; font-size: 1.2rem; text-decoration: none; color: ${palette.primaire}; }
-  .nav-pages { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.85rem; }
-  .nav-pages a { text-decoration: none; opacity: 0.75; }
-  .nav-pages a.actif { opacity: 1; font-weight: 600; border-bottom: 2px solid ${palette.primaire}; }
-  .hero-page { position: relative; padding: 72px 24px; text-align: center; color: white; overflow: hidden; }
-  .hero-page h1 { font-size: clamp(1.6rem, 5vw, 2.6rem); text-shadow: 0 2px 10px rgba(0,0,0,0.4); }
-  .hero-page p { margin-top: 10px; font-size: 1.05rem; text-shadow: 0 1px 6px rgba(0,0,0,0.4); }
-  .hero-fond { position: absolute; inset: 0; background-size: cover; background-position: center; z-index: -2; }
-  .hero-voile { position: absolute; inset: 0; background: rgba(0,0,0,0.45); z-index: -1; }
-  .section { padding: 48px 24px; max-width: 760px; margin: 0 auto; }
-  .section h2 { color: ${palette.primaire}; margin-bottom: 16px; }
-  .grille-images { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
-  .grille-images div { aspect-ratio: 1; border-radius: 12px; background-size: cover; background-position: center; }
-  .cartes { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
-  .carte { border-radius: 14px; overflow: hidden; border: 1px solid #0001; }
-  .carte .photo { height: 140px; background-size: cover; background-position: center; }
-  .carte .texte { padding: 14px; }
-  .formulaire { display: flex; flex-direction: column; gap: 12px; max-width: 420px; }
-  .formulaire input, .formulaire textarea { padding: 12px 14px; border: 2px solid ${palette.primaire}55; border-radius: 10px; font-family: inherit; }
-  .bouton { display: inline-block; margin-top: 12px; background: ${palette.primaire}; color: white; padding: 14px 28px; border-radius: 30px; text-decoration: none; font-weight: 600; border: none; cursor: pointer; font-size: 1rem; }
-  .pied { text-align: center; padding: 32px 24px; font-size: 0.85rem; opacity: 0.75; }
-  .bouton-wa { display: inline-block; margin: 10px 0; background: #25d366; color: white; padding: 10px 20px; border-radius: 20px; text-decoration: none; }
-  .mention { margin-top: 8px; font-size: 0.75rem; opacity: 0.5; }
-  ${STYLE_ANIMATIONS}
-</style>
-</head>
-<body>
-${entete(commerce, pages, pageActuelle, palette)}
-${corps}
-${pied(commerce, palette)}
-<script>${SCRIPT_ANIMATIONS}</script>
-</body>
-</html>`;
+function sectionFeatures(familleId, palette) {
+  const items = featuresDeLaFamille(familleId);
+  return `
+  <div class="section reveal-stagger grille-features">
+    ${items.map((t) => `<div class="feature"><div class="feature-puce"></div><p>${t}</p></div>`).join("")}
+  </div>`;
+}
+
+function sectionTemoignages() {
+  return `
+  <div class="section reveal">
+    <h2>Ce qu'on dit de nous</h2>
+    <div class="reveal-stagger cartes-temoignages">
+      ${TEMOIGNAGES_GENERIQUES.map((t) => `<div class="temoignage"><p>« ${t.texte} »</p><span>— ${t.auteur}</span></div>`).join("")}
+    </div>
+  </div>`;
+}
+
+function sectionFaqMini() {
+  return `
+  <div class="section reveal">
+    <h2>Questions fréquentes</h2>
+    ${FAQ_GENERIQUE.map((f) => `<details><summary>${f.q}</summary><p>${f.r}</p></details>`).join("")}
+  </div>`;
 }
 
 function imageFond(url) {
   return url ? `<div class="hero-fond hero-zoom" style="background-image:url('${url}')"></div><div class="hero-voile"></div>` : "";
 }
 
-// --- Gabarits de page, choisis par mot-clé dans le nom de la page ---
+function heroPage(titre, sousTitre, photos, grand) {
+  return `
+  <div class="${grand ? 'hero-page hero-grand' : 'hero-page'}">
+    ${imageFond(photos[0])}
+    <h1>${titre}</h1>
+    ${sousTitre ? `<p>${sousTitre}</p>` : ""}
+  </div>`;
+}
+
+// --- Gabarits de page ---
 
 function pageAccueil(commerce, famille, palette, accroche, photos) {
   return `
-  <div class="hero-page">
-    ${imageFond(photos[0])}
-    <h1>${commerce.nom}</h1>
-    <p>${accroche}</p>
-  </div>
+  ${heroPage(commerce.nom, accroche, photos, true)}
   <div class="section reveal">
     <h2>Bienvenue</h2>
     <p>${commerce.nom} vous accueille à ${commerce.quartier || commerce.ville}. ${famille.element_cle ? `Notre priorité : ${famille.element_cle.toLowerCase()}.` : ""}</p>
   </div>
+  ${sectionFeatures(famille.id, palette)}
   <div class="section reveal-stagger grille-images">
     ${photos.slice(1, 4).map((u) => `<div style="background-image:url('${u}')"></div>`).join("")}
-  </div>`;
+  </div>
+  ${sectionTemoignages()}
+  ${sectionFaqMini()}`;
 }
 
-function pageGalerie(commerce, palette, photos) {
+function pageGalerie(commerce, photos) {
   return `
-  <div class="hero-page" style="padding:48px 24px;">${imageFond(photos[0])}<h1>Galerie</h1></div>
-  <div class="section reveal-stagger grille-images">
+  ${heroPage("Galerie", null, photos, false)}
+  <div class="section reveal-stagger grille-images grille-dense">
     ${photos.slice(1).map((u) => `<div style="background-image:url('${u}')"></div>`).join("")}
   </div>`;
 }
 
-function pageContact(commerce, palette, photos) {
-  const lienWhatsapp = commerce.telephone ? `https://wa.me/${commerce.telephone.replace(/[^0-9]/g, "")}` : null;
+function pageContact(commerce, photos) {
+  const wa = lienWhatsapp(commerce);
   return `
-  <div class="hero-page" style="padding:48px 24px;">${imageFond(photos[0])}<h1>Contact</h1></div>
+  ${heroPage("Contact", null, photos, false)}
   <div class="section reveal">
     <h2>Nous trouver</h2>
     <p>${commerce.adresse || ""}</p>
     <p>${commerce.quartier || ""}, ${commerce.ville || ""}</p>
-    ${lienWhatsapp ? `<a class="bouton" href="${lienWhatsapp}" target="_blank" rel="noopener">Écrire sur WhatsApp</a>` : ""}
+    ${wa ? `<a class="bouton" href="${wa}" target="_blank" rel="noopener">Écrire sur WhatsApp</a>` : ""}
   </div>`;
 }
 
-function pageTarifs(commerce, palette, photos) {
+function pageTarifs(commerce, photos) {
   return `
-  <div class="hero-page" style="padding:48px 24px;">${imageFond(photos[0])}<h1>Tarifs</h1></div>
+  ${heroPage("Tarifs", null, photos, false)}
   <div class="section reveal-stagger cartes">
     ${["Formule simple", "Formule standard", "Formule complète"].map((nom, i) => `
       <div class="carte">
         <div class="photo" style="background-image:url('${photos[i + 1] || ''}')"></div>
-        <div class="texte"><strong>${nom}</strong><p>Détails à personnaliser.</p></div>
+        <div class="texte"><strong>${nom}</strong><p>Détails à personnaliser.</p><span class="prix">— FCFA</span></div>
       </div>`).join("")}
   </div>`;
 }
 
-function pageFormulaire(titre, commerce, palette, photos) {
+function pageFormulaire(titre, photos) {
   return `
-  <div class="hero-page" style="padding:48px 24px;">${imageFond(photos[0])}<h1>${titre}</h1></div>
+  ${heroPage(titre, null, photos, false)}
   <div class="section reveal">
     <form class="formulaire" onsubmit="event.preventDefault(); alert('Formulaire à activer.');">
       <input type="text" placeholder="Votre nom" required />
@@ -154,9 +167,9 @@ function pageFormulaire(titre, commerce, palette, photos) {
   </div>`;
 }
 
-function pageEquipe(titre, commerce, palette, photos) {
+function pageEquipe(titre, photos) {
   return `
-  <div class="hero-page" style="padding:48px 24px;">${imageFond(photos[0])}<h1>${titre}</h1></div>
+  ${heroPage(titre, null, photos, false)}
   <div class="section reveal-stagger cartes">
     ${photos.slice(1, 4).map((u) => `
       <div class="carte">
@@ -166,9 +179,46 @@ function pageEquipe(titre, commerce, palette, photos) {
   </div>`;
 }
 
-function pageGenerique(titre, commerce, famille, palette, photos) {
+// Menu/carte restauration — sections par catégorie, inspiré des thèmes WordPress restaurant
+function pageMenu(commerce, photos) {
+  const categories = [
+    { nom: "Entrées", plats: ["Plat à personnaliser", "Plat à personnaliser"] },
+    { nom: "Plats principaux", plats: ["Plat à personnaliser", "Plat à personnaliser", "Plat à personnaliser"] },
+    { nom: "Desserts", plats: ["Plat à personnaliser"] },
+    { nom: "Boissons", plats: ["Boisson à personnaliser", "Boisson à personnaliser"] },
+  ];
   return `
-  <div class="hero-page" style="padding:56px 24px;">${imageFond(photos[0])}<h1>${titre}</h1></div>
+  ${heroPage("Menu / Carte", "À personnaliser avec vos vrais plats et prix", photos, false)}
+  <div class="section reveal">
+    ${categories.map((cat) => `
+      <div class="categorie-menu">
+        <h3>${cat.nom}</h3>
+        ${cat.plats.map((p) => `<div class="ligne-menu"><span>${p}</span><span class="prix">— FCFA</span></div>`).join("")}
+      </div>`).join("")}
+  </div>`;
+}
+
+// Boutique/catalogue/produit — grille façon Shopify
+function pageCatalogue(titre, photos) {
+  const nbProduits = Math.min(photos.length - 1, 6);
+  return `
+  ${heroPage(titre, "Parcourez nos produits", photos, false)}
+  <div class="section reveal-stagger grille-produits">
+    ${Array.from({ length: nbProduits }).map((_, i) => `
+      <div class="carte-produit">
+        <div class="photo" style="background-image:url('${photos[i + 1]}')"></div>
+        <div class="texte">
+          <strong>Produit à personnaliser</strong>
+          <span class="prix">— FCFA</span>
+          <button class="bouton-petit" onclick="alert('Commande WhatsApp à activer.')">Commander</button>
+        </div>
+      </div>`).join("")}
+  </div>`;
+}
+
+function pageGenerique(titre, commerce, photos) {
+  return `
+  ${heroPage(titre, null, photos, false)}
   <div class="section reveal">
     <p>${titre} — contenu à personnaliser pour ${commerce.nom}.</p>
   </div>
@@ -179,19 +229,105 @@ function pageGenerique(titre, commerce, famille, palette, photos) {
 
 function choisirGabarit(titre, commerce, famille, palette, photos) {
   const t = titre.toLowerCase();
-  if (t.includes("accueil")) return pageAccueil(commerce, famille, palette, styleEtAccroche(commerce, famille.id, hashSimple(commerce.id)).accroche, photos);
-  if (t.includes("galerie")) return pageGalerie(commerce, palette, photos);
-  if (t.includes("contact")) return pageContact(commerce, palette, photos);
-  if (t.includes("tarif")) return pageTarifs(commerce, palette, photos);
+  if (t.includes("accueil")) {
+    const { accroche } = styleEtAccroche(commerce, famille.id, hashSimple(commerce.id));
+    return pageAccueil(commerce, famille, palette, accroche, photos);
+  }
+  if (t.includes("menu") || t.includes("carte")) return pageMenu(commerce, photos);
+  if (t.includes("boutique") || t.includes("catalogue") || t.includes("produit") || t.includes("catégories"))
+    return pageCatalogue(titre, photos);
+  if (t.includes("galerie")) return pageGalerie(commerce, photos);
+  if (t.includes("contact")) return pageContact(commerce, photos);
+  if (t.includes("tarif")) return pageTarifs(commerce, photos);
   if (t.includes("réservation") || t.includes("rendez-vous") || t.includes("inscription") || t.includes("devis") || t.includes("souscription") || t.includes("candidature"))
-    return pageFormulaire(titre, commerce, palette, photos);
+    return pageFormulaire(titre, photos);
   if (t.includes("équipe") || t.includes("professionnels") || t.includes("agents") || t.includes("coachs"))
-    return pageEquipe(titre, commerce, palette, photos);
-  return pageGenerique(titre, commerce, famille, palette, photos);
+    return pageEquipe(titre, photos);
+  return pageGenerique(titre, commerce, photos);
 }
 
-// Génère toutes les pages "essentielles" (⭐) d'une famille pour un commerce donné.
-// Retourne { [slug]: { titre, html } }
+const STYLE_SUPPLEMENTAIRE = `
+.entete-sticky { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 14px 24px; flex-wrap: wrap; gap: 8px; background: rgba(255,255,255,0.92); backdrop-filter: blur(6px); }
+.logo { font-weight: 800; font-size: 1.2rem; text-decoration: none; }
+.nav-pages { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.82rem; }
+.nav-pages a { text-decoration: none; opacity: 0.75; }
+.nav-pages a.actif { opacity: 1; font-weight: 600; border-bottom: 2px solid currentColor; }
+.bouton-wa-entete { background: #25d366; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; }
+.wa-flottant { position: fixed; bottom: 20px; right: 20px; background: #25d366; width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; text-decoration: none; box-shadow: 0 4px 14px rgba(0,0,0,0.25); z-index: 20; }
+.hero-page { position: relative; padding: 72px 24px; text-align: center; color: white; overflow: hidden; }
+.hero-grand { padding: 100px 24px; }
+.hero-page h1 { font-size: clamp(1.6rem, 5vw, 2.8rem); text-shadow: 0 2px 10px rgba(0,0,0,0.4); }
+.hero-page p { margin-top: 10px; font-size: 1.05rem; text-shadow: 0 1px 6px rgba(0,0,0,0.4); }
+.hero-fond { position: absolute; inset: 0; background-size: cover; background-position: center; z-index: -2; }
+.hero-voile { position: absolute; inset: 0; background: rgba(0,0,0,0.45); z-index: -1; }
+.section { padding: 48px 24px; max-width: 780px; margin: 0 auto; }
+.section h2 { margin-bottom: 16px; }
+.grille-images { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+.grille-dense { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
+.grille-images div { aspect-ratio: 1; border-radius: 12px; background-size: cover; background-position: center; }
+.grille-features { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; max-width: 780px; margin: 0 auto; }
+.feature { text-align: center; padding: 16px; }
+.feature-puce { width: 36px; height: 36px; border-radius: 50%; background: currentColor; opacity: 0.15; margin: 0 auto 10px; }
+.cartes { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.carte { border-radius: 14px; overflow: hidden; border: 1px solid #0001; }
+.carte .photo { height: 140px; background-size: cover; background-position: center; }
+.carte .texte { padding: 14px; }
+.cartes-temoignages { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.temoignage { padding: 18px; border-radius: 14px; background: currentColor; background: rgba(0,0,0,0.04); }
+.temoignage span { display: block; margin-top: 10px; font-size: 0.85rem; opacity: 0.7; }
+.categorie-menu { margin-bottom: 28px; }
+.categorie-menu h3 { margin-bottom: 10px; }
+.ligne-menu { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #0002; }
+.grille-produits { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; }
+.carte-produit { border-radius: 14px; overflow: hidden; border: 1px solid #0001; }
+.carte-produit .photo { aspect-ratio: 1; background-size: cover; background-position: center; }
+.carte-produit .texte { padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+.prix { font-weight: 700; opacity: 0.8; }
+.bouton-petit { margin-top: 6px; border: none; border-radius: 16px; padding: 8px 14px; font-size: 0.85rem; cursor: pointer; background: currentColor; color: white; }
+.formulaire { display: flex; flex-direction: column; gap: 12px; max-width: 420px; }
+.formulaire input, .formulaire textarea { padding: 12px 14px; border-radius: 10px; font-family: inherit; border: 2px solid currentColor; }
+.bouton { display: inline-block; margin-top: 12px; padding: 14px 28px; border-radius: 30px; text-decoration: none; font-weight: 600; border: none; cursor: pointer; font-size: 1rem; color: white; }
+.pied { padding: 40px 24px 24px; font-size: 0.88rem; }
+.pied-colonnes { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px; max-width: 780px; margin: 0 auto 20px; }
+.pied a { display: block; margin-top: 6px; }
+.mention { text-align: center; opacity: 0.5; font-size: 0.75rem; }
+details { border-bottom: 1px solid #0001; padding: 12px 0; }
+summary { cursor: pointer; font-weight: 600; }
+details p { margin-top: 8px; opacity: 0.8; }
+`;
+
+function enveloppe({ titrePage, commerce, pages, pageActuelle, palette, corps, famille }) {
+  const description = `${commerce.nom} — ${titrePage} à ${commerce.ville || ''}.`.slice(0, 155);
+  return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>${titrePage} — ${commerce.nom}</title>
+<meta name="description" content="${description}" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏪</text></svg>" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Schibsted Grotesk', Arial, sans-serif; background: ${palette.fond}; color: ${palette.texte}; }
+  a { color: inherit; }
+  .bouton, .bouton-petit, .wa-flottant, .bouton-wa-entete { color: white; }
+  .bouton, .bouton-petit { background: ${palette.primaire}; }
+  .section h2, .feature-puce, .formulaire input, .formulaire textarea { color: ${palette.primaire}; }
+  .nav-pages a.actif { border-color: ${palette.primaire}; }
+  ${STYLE_SUPPLEMENTAIRE}
+  ${STYLE_ANIMATIONS}
+</style>
+</head>
+<body>
+${entete(commerce, pages, pageActuelle)}
+${corps}
+${pied(commerce)}
+${boutonWhatsappFlottant(commerce)}
+<script>${SCRIPT_ANIMATIONS}</script>
+</body>
+</html>`;
+}
+
 export function genererSiteMultiPages(commerce, famille) {
   const seed = hashSimple(commerce.id || commerce.nom);
   const { palette } = styleEtAccroche(commerce, famille.id, seed);
@@ -199,12 +335,12 @@ export function genererSiteMultiPages(commerce, famille) {
   const resultat = {};
 
   for (const titrePage of pages) {
-    const photos = photosDuSecteur(commerce.metier_numero, seed + hashSimple(titrePage), 5);
+    const photos = photosDuSecteur(commerce.metier_numero, seed + hashSimple(titrePage), 7);
     const corps = choisirGabarit(titrePage, commerce, famille, palette, photos);
     const slug = slugifier(titrePage);
     resultat[slug] = {
       titre: titrePage,
-      html: enveloppe({ titrePage, commerce, pages, pageActuelle: titrePage, palette, corps }),
+      html: enveloppe({ titrePage, commerce, pages, pageActuelle: titrePage, palette, corps, famille }),
     };
   }
 
