@@ -328,6 +328,60 @@ ${boutonWhatsappFlottant(commerce)}
 </html>`;
 }
 
+// Version "tout en un" : toutes les pages dans un seul fichier HTML,
+// navigation par ancre (#section) au lieu de fichiers séparés — pratique sur mobile.
+export function genererSiteUnePage(commerce, famille) {
+  const seed = hashSimple(commerce.id || commerce.nom);
+  const { palette } = styleEtAccroche(commerce, famille.id, seed);
+  const pages = famille.pages_essentielles;
+
+  const liensNav = pages.map((p) => `<a href="#${slugifier(p)}">${p}</a>`).join("");
+  const wa = lienWhatsapp(commerce);
+
+  const sections = pages.map((titrePage) => {
+    const photos = photosDuSecteur(commerce.metier_numero, seed + hashSimple(titrePage), 7);
+    const corps = choisirGabarit(titrePage, commerce, famille, palette, photos);
+    return `<section id="${slugifier(titrePage)}" class="page-section">${corps}</section>`;
+  }).join("");
+
+  const description = `${commerce.nom} à ${commerce.ville || ''}.`.slice(0, 155);
+
+  return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>${commerce.nom}</title>
+<meta name="description" content="${description}" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏪</text></svg>" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Schibsted Grotesk', Arial, sans-serif; background: ${palette.fond}; color: ${palette.texte}; }
+  a { color: inherit; }
+  .bouton, .bouton-petit, .wa-flottant, .bouton-wa-entete { color: white; }
+  .bouton, .bouton-petit { background: ${palette.primaire}; }
+  .section h2, .feature-puce, .formulaire input, .formulaire textarea { color: ${palette.primaire}; }
+  .nav-pages a.actif { border-color: ${palette.primaire}; }
+  .page-section { border-bottom: 6px solid ${palette.fond}; }
+  ${STYLE_SUPPLEMENTAIRE}
+  ${STYLE_ANIMATIONS}
+</style>
+</head>
+<body>
+  <header class="entete-sticky">
+    <span class="logo">${commerce.nom}</span>
+    <nav class="nav-pages">${liensNav}</nav>
+    ${wa ? `<a href="${wa}" target="_blank" rel="noopener" class="bouton-wa-entete">WhatsApp</a>` : ""}
+  </header>
+  ${sections}
+  ${pied(commerce)}
+  ${boutonWhatsappFlottant(commerce)}
+<script>${SCRIPT_ANIMATIONS}</script>
+</body>
+</html>`;
+}
+
 export function genererSiteMultiPages(commerce, famille) {
   const seed = hashSimple(commerce.id || commerce.nom);
   const { palette } = styleEtAccroche(commerce, famille.id, seed);
