@@ -1,6 +1,8 @@
 // Génère les données d'une maquette (texte + style) à partir d'un commerce,
 // puis les transforme en page HTML autonome.
 
+import { photosDuSecteur } from "./photos.js";
+
 const ACCROCHES = {
   restauration: [
     "Le goût de {quartier}, servi avec le sourire.",
@@ -99,6 +101,7 @@ export function genererDonneesMaquette(commerce, styleIndex = null) {
   const indexStyle = styleIndex !== null ? styleIndex : base % (banqueAccroches.length * PALETTES.length);
   const indexAccroche = indexStyle % banqueAccroches.length;
   const indexPalette = Math.floor(indexStyle / banqueAccroches.length) % PALETTES.length;
+  const photos = photosDuSecteur(commerce.metier_numero, indexStyle, 4);
 
   return {
     styleIndex: indexStyle,
@@ -110,14 +113,24 @@ export function genererDonneesMaquette(commerce, styleIndex = null) {
     ville: commerce.ville,
     telephone: commerce.telephone,
     adresse: commerce.adresse,
+    photoPrincipale: photos[0] || null,
+    galerie: photos.slice(1),
   };
 }
 
 export function rendreHtmlMaquette(donnees) {
-  const { nom, accroche, palette, quartier, ville, telephone, adresse } = donnees;
+  const { nom, accroche, palette, quartier, ville, telephone, adresse, photoPrincipale, galerie } = donnees;
   const lienWhatsapp = telephone
     ? `https://wa.me/${telephone.replace(/[^0-9]/g, "")}`
     : null;
+
+  const styleHero = photoPrincipale
+    ? `background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url('${photoPrincipale}'); background-size: cover; background-position: center;`
+    : `background: ${palette.primaire};`;
+
+  const galerieHtml = (galerie || [])
+    .map((url) => `<div style="background-image:url('${url}')"></div>`)
+    .join("");
 
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -128,13 +141,13 @@ export function rendreHtmlMaquette(donnees) {
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Schibsted Grotesk', Arial, sans-serif; background: ${palette.fond}; color: ${palette.texte}; }
-  .hero { padding: 64px 24px; text-align: center; background: ${palette.primaire}; color: white; }
-  .hero h1 { font-size: clamp(1.8rem, 6vw, 3rem); margin-bottom: 12px; }
-  .hero p { font-size: 1.2rem; opacity: 0.9; }
+  .hero { padding: 96px 24px; text-align: center; color: white; ${styleHero} }
+  .hero h1 { font-size: clamp(1.8rem, 6vw, 3rem); margin-bottom: 12px; text-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+  .hero p { font-size: 1.2rem; text-shadow: 0 1px 4px rgba(0,0,0,0.4); }
   .section { padding: 40px 24px; max-width: 700px; margin: 0 auto; }
   .section h2 { margin-bottom: 16px; color: ${palette.primaire}; }
   .galerie { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  .galerie div { aspect-ratio: 1; border-radius: 12px; background: ${palette.primaire}22; }
+  .galerie div { aspect-ratio: 1; border-radius: 12px; background-size: cover; background-position: center; }
   .contact { text-align: center; padding: 40px 24px; }
   .bouton { display: inline-block; margin-top: 16px; background: ${palette.primaire}; color: white; padding: 14px 28px; border-radius: 30px; text-decoration: none; font-weight: 600; }
 </style>
@@ -150,7 +163,7 @@ export function rendreHtmlMaquette(donnees) {
   </div>
   <div class="section">
     <h2>Galerie</h2>
-    <div class="galerie"><div></div><div></div><div></div></div>
+    <div class="galerie">${galerieHtml}</div>
   </div>
   <div class="contact">
     <h2>Nous contacter</h2>
