@@ -3,7 +3,7 @@
 
 import { photosDuSecteur } from "./photos.js";
 
-const ACCROCHES = {
+export const ACCROCHES = {
   restauration: [
     "Le goût de {quartier}, servi avec le sourire.",
     "{nom} — on vous attend à table.",
@@ -69,16 +69,76 @@ const ACCROCHES = {
     "Simple, rapide, efficace.",
     "Une adresse à connaître à {ville}.",
   ],
+  immobilier: [
+    "Trouvez votre bien à {ville}.",
+    "{nom} — votre projet immobilier, accompagné.",
+    "Acheter, louer, vendre : en confiance.",
+  ],
+  sport_fitness: [
+    "Votre forme, notre terrain.",
+    "{nom} — dépassez-vous à {quartier}.",
+    "L'énergie commence ici.",
+  ],
+  impression_pub: [
+    "Votre image, imprimée avec soin.",
+    "{nom} — vos idées, en couleur.",
+    "Du concept au produit fini.",
+  ],
+  securite: [
+    "Votre tranquillité, notre mission.",
+    "{nom} — la sécurité à {quartier}.",
+    "Veiller, protéger, rassurer.",
+  ],
+  nettoyage: [
+    "Propre, net, impeccable.",
+    "{nom} — la propreté sans compromis à {ville}.",
+    "On s'occupe du reste.",
+  ],
+  decoration: [
+    "Votre intérieur, réinventé.",
+    "{nom} — le style qui vous ressemble.",
+    "Chaque pièce raconte une histoire.",
+  ],
+  laveries: [
+    "Vos vêtements, comme neufs.",
+    "{nom} — collecte et livraison à {quartier}.",
+    "Propre sans y penser.",
+  ],
+  coworking: [
+    "Votre bureau, où que vous soyez.",
+    "{nom} — travaillez bien à {ville}.",
+    "Un espace pensé pour vous.",
+  ],
+  energie_solaire: [
+    "Le soleil, votre énergie.",
+    "{nom} — l'indépendance énergétique à {ville}.",
+    "Propre, fiable, durable.",
+  ],
+  assurances: [
+    "Protégez ce qui compte.",
+    "{nom} — votre tranquillité d'esprit.",
+    "Des garanties claires, à {ville}.",
+  ],
+  pompes_funebres: [
+    "Un accompagnement digne, à {quartier}.",
+    "{nom} — présents dans les moments difficiles.",
+    "Honorer avec respect.",
+  ],
+  agroalimentaire: [
+    "Du terroir à votre table.",
+    "{nom} — la qualité, transformée à {ville}.",
+    "Un savoir-faire local.",
+  ],
 };
 
-const PALETTES = [
+export const PALETTES = [
   { primaire: "#1d5bff", fond: "#ffffff", texte: "#0b1b3f" },
   { primaire: "#d4572a", fond: "#fff8f3", texte: "#2b1a10" },
   { primaire: "#1a8f5c", fond: "#f3fff8", texte: "#0d2b1c" },
   { primaire: "#9b2bd4", fond: "#faf3ff", texte: "#2b0d2b" },
 ];
 
-function hashSimple(texte) {
+export function hashSimple(texte) {
   let h = 0;
   for (let i = 0; i < texte.length; i++) {
     h = (h * 31 + texte.charCodeAt(i)) >>> 0;
@@ -86,7 +146,7 @@ function hashSimple(texte) {
   return h;
 }
 
-function remplacerVariables(texte, commerce) {
+export function remplacerVariables(texte, commerce) {
   return texte
     .replace(/{nom}/g, commerce.nom)
     .replace(/{ville}/g, commerce.ville || "")
