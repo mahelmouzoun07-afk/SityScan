@@ -1,6 +1,6 @@
-// Usage : node scripts/geocoder.mjs
+// Usage : node --env-file=.env scripts/geocoder.mjs
 // Géocode tous les commerces sans latitude/longitude, via Nominatim (OpenStreetMap, gratuit).
-// Respecte la limite de 1 requête/seconde imposée par leur politique d'usage.
+// Version 2 : nettoie les adresses, diagnostics complets en cas d'échec, repli sur ville/pays.
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -20,6 +20,12 @@ function attendre(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// Retire les annotations de collecte type "(estimé GPS)", "(d'après le nom)", "(À vérifier)"
+function nettoyer(texte) {
+  if (!texte) return "";
+  return texte.replace(/\([^)]*\)/g, "").trim();
+}
+
 async function recupererCommercesSansCoordonnees() {
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/commerces?latitude=is.null&select=id,nom,quartier,adresse,ville,pays`,
@@ -30,13 +36,26 @@ async function recupererCommercesSansCoordonnees() {
 }
 
 async function geocoder(requete) {
-  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(requete)}`;
+  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&addressdetails=0&q=${encodeURIComponent(requete)}`;
   const res = await fetch(url, {
-    headers: { "User-Agent": "ScanTaVille-import/1.0 (usage interne, une seule fois)" },
+    headers: {
+      "User-Agent": "SityScan/1.0 (+https://github.com/mahelmouzoun07-afk/SityScan; usage interne ponctuel)",
+      "Accept-Language": "fr",
+    },
   });
-  if (!res.ok) throw new Error(`Erreur Nominatim : ${res.status}`);
-  const data = await res.json();
-  return data.length ? { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) } : null;
+
+  const texteBrut = await res.text();
+  let data;
+  try {
+    data = JSON.parse(texteBrut);
+  } catch {
+    return { ok: false, statut: res.status, brut: texteBrut.slice(0, 200) };
+  }
+
+  if (!res.ok) return { ok: false, statut: res.status, brut: texteBrut.slice(0, 200) };
+  if (!data.length) return { ok: false, statut: res.status, brut: "réponse vide (aucun résultat)" };
+
+  return { ok: true, lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
 }
 
 async function mettreAJour(id, lat, lon) {
@@ -49,29 +68,41 @@ async function mettreAJour(id, lat, lon) {
 }
 
 const commerces = await recupererCommercesSansCoordonnees();
-console.log(`${commerces.length} commerces à géocoder.`);
+console.log(`${commerces.length} commerces à géocoder.\n`);
 
-let reussis = 0, echoues = 0;
+let reussis = 0, approximatifs = 0, echoues = 0;
 
 for (const c of commerces) {
-  const requete = [c.quartier, c.adresse, c.ville, c.pays].filter(Boolean).join(", ");
-  try {
-    const point = await geocoder(requete);
-    if (point) {
-      await mettreAJour(c.id, point.lat, point.lon);
-      console.log(`✓ ${c.nom} → ${point.lat}, ${point.lon}`);
-      reussis++;
+  const quartier = nettoyer(c.quartier);
+  const adresse = nettoyer(c.adresse);
+  const requetePrecise = [quartier, adresse, c.ville, c.pays].filter(Boolean).join(", ");
+
+  let resultat = await geocoder(requetePrecise);
+
+  if (!resultat.ok) {
+    console.warn(`✗ Échec requête précise "${requetePrecise}" — HTTP ${resultat.statut} : ${resultat.brut}`);
+    await attendre(1200);
+
+    // Repli : coordonnées approximatives de la ville, mieux que rien, marqué à vérifier
+    const requeteVille = [c.ville, c.pays].filter(Boolean).join(", ");
+    resultat = await geocoder(requeteVille);
+
+    if (resultat.ok) {
+      console.log(`  → repli ville "${requeteVille}" réussi : ${resultat.lat}, ${resultat.lon} (approximatif)`);
+      await mettreAJour(c.id, resultat.lat, resultat.lon);
+      approximatifs++;
     } else {
-      console.warn(`✗ Introuvable : ${c.nom} (${requete})`);
+      console.error(`  → repli ville aussi en échec — HTTP ${resultat.statut} : ${resultat.brut}`);
       echoues++;
     }
-  } catch (e) {
-    console.error(`✗ Erreur sur ${c.nom} :`, e.message);
-    echoues++;
+  } else {
+    console.log(`✓ ${c.nom} → ${resultat.lat}, ${resultat.lon}`);
+    await mettreAJour(c.id, resultat.lat, resultat.lon);
+    reussis++;
   }
-  await attendre(1100); // 1 req/seconde max, imposé par Nominatim
+
+  await attendre(1200); // 1 req/seconde max, imposé par Nominatim
 }
 
-console.log(`\nTerminé. ${reussis} géocodés, ${echoues} échoués.`);
-console.log("Les échoués gardent latitude/longitude = null, à corriger manuellement si besoin.");
+console.log(`\nTerminé. ${reussis} précis, ${approximatifs} approximatifs (ville), ${echoues} échoués.`);
 process.exit(0);
