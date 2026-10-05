@@ -6,11 +6,14 @@ import { initAuth } from "./auth.js";
 import { initFicheCommerce, getCommerceOuvert } from "./fiche.js";
 import { mettreAJourStatut } from "./prospection.js";
 import { ouvrirGenerateur, initGenerateur } from "./generateur.js";
+import { initMonPlan } from "./plan.js";
+import { getUtilisateurActuel } from "./auth.js";
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 initAuth();
 initGenerateur();
+initMonPlan();
 
 const map = new maplibregl.Map({
   container: "map",
@@ -46,5 +49,10 @@ initRechercheVille({
   onVilleChoisie: async (ville) => {
     const { total, sansSite } = await lancerScan(map, ville);
     majCompteur(total, sansSite);
+
+    const utilisateur = getUtilisateurActuel();
+    if (utilisateur) {
+      await supabase.from("profiles").update({ ville_cible: ville }).eq("id", utilisateur.id);
+    }
   },
 });

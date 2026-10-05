@@ -362,3 +362,49 @@ footer a {
   color: var(--blanc);
   border: none;
 }
+
+.plan-contenu { width: 100%; max-width: 640px; text-align: left; }
+
+.plan-banniere { background: linear-gradient(135deg, var(--bleu), #0b1b3f); color: white; border-radius: 20px; padding: 24px; margin-bottom: 20px; }
+.plan-mois { font-family: var(--font-mono); font-size: 0.75rem; opacity: 0.8; }
+.plan-chiffre { font-family: var(--font-titre); font-size: 2.2rem; font-weight: 800; margin: 8px 0; }
+.plan-chiffre small { font-size: 1rem; font-weight: 400; opacity: 0.85; }
+.plan-barre { height: 6px; background: rgba(255,255,255,0.25); border-radius: 4px; margin-top: 12px; overflow: hidden; }
+.plan-barre-remplie { height: 100%; background: white; border-radius: 4px; transition: width 0.4s ease; }
+
+.plan-aujourdhui { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #e2e6ef; }
+.plan-label { font-family: var(--font-mono); font-size: 0.75rem; color: #7b849c; text-transform: uppercase; }
+.plan-compte { font-family: var(--font-titre); font-size: 1.3rem; font-weight: 700; margin-top: 4px; }
+.plan-boutons-compte { display: flex; gap: 8px; }
+.btn-rond { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--marine); background: white; font-size: 1.1rem; cursor: pointer; }
+.btn-rond-actif { background: var(--bleu); color: white; border: none; width: auto; padding: 0 16px; border-radius: 20px; font-weight: 700; }
+
+.plan-semaine { display: flex; justify-content: space-between; padding: 16px 0; }
+.barre-jour { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 0.75rem; color: #7b849c; }
+.barre-jour .barre { width: 10px; height: 36px; border-radius: 6px; background: #e2e6ef; }
+.barre-jour.rempli .barre { background: var(--bleu); }
+
+.plan-cartes { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin: 20px 0; }
+.plan-carte { background: #f7f9ff; border-radius: 16px; padding: 18px; }
+.plan-carte h3 { margin: 6px 0; font-family: var(--font-titre); font-size: 1.1rem; }
+.plan-felicitations { text-align: center; margin: 20px 0; font-size: 1.1rem; }
+
+.plan-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 10px; margin: 20px 0; text-align: center; }
+.plan-stats div { background: #f7f9ff; border-radius: 12px; padding: 12px 6px; }
+.plan-stats strong { display: block; font-family: var(--font-titre); font-size: 1.3rem; color: var(--bleu); }
+.plan-stats span { font-size: 0.7rem; color: #7b849c; text-transform: uppercase; }
+
+.plan-roadmap { margin: 24px 0; }
+.plan-roadmap h3 { font-family: var(--font-titre); margin-bottom: 12px; }
+.roadmap-etape { display: flex; gap: 14px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid #f0f2f8; }
+.roadmap-etape.fait strong, .roadmap-etape.fait p { opacity: 0.5; text-decoration: line-through; }
+.roadmap-numero { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--bleu); color: var(--bleu); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0; }
+.roadmap-etape.fait .roadmap-numero { background: var(--bleu); color: white; }
+.roadmap-etape p { font-size: 0.85rem; color: #7b849c; margin-top: 2px; }
+.btn-petit-cta { margin-left: auto; background: none; border: 1px solid var(--bleu); color: var(--bleu); border-radius: 16px; padding: 6px 12px; font-size: 0.8rem; cursor: pointer; white-space: nowrap; }
+
+.plan-reglages { margin-top: 24px; padding-top: 20px; border-top: 1px solid #e2e6ef; }
+.plan-reglages h3 { font-family: var(--font-titre); margin-bottom: 12px; }
+.reglages-grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 12px; }
+.reglages-grille label { font-size: 0.8rem; color: #4a5670; display: flex; flex-direction: column; gap: 4px; }
+.reglages-grille input { padding: 10px; border: 2px solid var(--marine); border-radius: 10px; font-family: var(--font-texte); }
