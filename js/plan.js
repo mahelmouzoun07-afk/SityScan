@@ -167,6 +167,19 @@ export async function ouvrirMonPlan() {
         </div>`).join("")}
     </div>
 
+    <div class="plan-journal">
+      <h3>Journal de bord</h3>
+      <p class="message-discret">Ta journée, en une ligne ?</p>
+      <div class="humeur-boutons">
+        <button class="btn-humeur" data-humeur="dure">🔴 Dure</button>
+        <button class="btn-humeur" data-humeur="correcte">🟡 Correcte</button>
+        <button class="btn-humeur" data-humeur="au_top">🟢 Au top</button>
+      </div>
+      <textarea id="journal-note" rows="3" placeholder="Ex : 6 commerces vus rue Nationale, le fleuriste veut revoir la maquette jeudi."></textarea>
+      <button class="cta" id="btn-ajouter-journal">Ajouter au journal</button>
+      <div id="journal-liste"></div>
+    </div>
+
     <div class="plan-reglages">
       <h3>Mes réglages</h3>
       <div class="reglages-grille">
@@ -190,6 +203,42 @@ export async function ouvrirMonPlan() {
       await supabase.from("profiles").update({ roadmap_manuel: nouveauManuel }).eq("id", utilisateur.id);
       ouvrirMonPlan();
     });
+  });
+
+  // Journal de bord
+  let humeurChoisie = "correcte";
+  contenu.querySelectorAll(".btn-humeur").forEach((b) => {
+    if (b.dataset.humeur === humeurChoisie) b.classList.add("choisi");
+    b.addEventListener("click", () => {
+      humeurChoisie = b.dataset.humeur;
+      contenu.querySelectorAll(".btn-humeur").forEach((x) => x.classList.remove("choisi"));
+      b.classList.add("choisi");
+    });
+  });
+
+  async function rafraichirJournal() {
+    const utilisateur = getUtilisateurActuel();
+    const { data: entrees } = await supabase
+      .from("journal_entrees")
+      .select("humeur, note, cree_le")
+      .eq("profile_id", utilisateur.id)
+      .order("cree_le", { ascending: false })
+      .limit(5);
+
+    const emoji = { dure: "🔴", correcte: "🟡", au_top: "🟢" };
+    const liste = document.getElementById("journal-liste");
+    liste.innerHTML = (entrees && entrees.length)
+      ? entrees.map((e) => `<div class="journal-entree"><span>${emoji[e.humeur]} ${new Date(e.cree_le).toLocaleDateString("fr-FR")}</span><p>${e.note || ""}</p></div>`).join("")
+      : "<p class='message-discret'>Rien pour l'instant. Écris ta première note ce soir.</p>";
+  }
+  rafraichirJournal();
+
+  document.getElementById("btn-ajouter-journal").addEventListener("click", async () => {
+    const utilisateur = getUtilisateurActuel();
+    const note = document.getElementById("journal-note").value.trim();
+    await supabase.from("journal_entrees").insert({ profile_id: utilisateur.id, humeur: humeurChoisie, note });
+    document.getElementById("journal-note").value = "";
+    rafraichirJournal();
   });
 
   document.getElementById("btn-enregistrer-reglages").addEventListener("click", async () => {

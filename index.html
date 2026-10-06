@@ -18,9 +18,44 @@
       <button id="btn-autre-ville">Autre ville</button>
       <button id="btn-mode-tournage">Mode tournage</button>
       <button id="btn-mon-plan">Mon plan</button>
+      <button id="btn-profil" hidden>Profil</button>
+      <button id="btn-kit-legal">Kit légal</button>
+      <button id="btn-mode-tournage">Mode tournage</button>
       <button id="btn-compte">Mon compte</button>
     </nav>
   </header>
+
+  <section id="ecran-profil" class="ecran-plein" hidden>
+    <button id="btn-fermer-profil" class="btn-fermer" aria-label="Fermer">✕</button>
+    <div id="profil-contenu" class="plan-contenu"></div>
+  </section>
+
+  <section id="ecran-devis" class="ecran-plein" hidden>
+    <button id="btn-fermer-devis" class="btn-fermer" aria-label="Fermer">✕</button>
+    <h2>Faire un devis</h2>
+    <p id="devis-commerce-nom" class="message-discret"></p>
+    <form id="form-devis" class="formulaire-app">
+      <input type="text" id="devis-nom-client" placeholder="Nom du client" required />
+      <input type="number" id="devis-montant" placeholder="Montant (FCFA)" value="70000" required />
+      <button type="submit" class="cta">Générer le devis (PDF)</button>
+    </form>
+  </section>
+
+  <section id="ecran-kit-legal" class="ecran-plein" hidden>
+    <button id="btn-fermer-kit-legal" class="btn-fermer" aria-label="Fermer">✕</button>
+    <div class="plan-contenu">
+      <h2>Kit légal</h2>
+      <p class="message-discret">Ceci est un guide général, pas un conseil juridique personnalisé. Vérifie les règles spécifiques à ton pays.</p>
+      <h3>Pour facturer légalement</h3>
+      <p>Dans la plupart des pays d'Afrique de l'Ouest, un statut d'entrepreneur individuel ou de micro-entreprise suffit pour démarrer, et s'obtient souvent gratuitement ou à faible coût auprès du centre de formalités de ton pays.</p>
+      <h3>Ce qu'il faut sur un devis/facture</h3>
+      <p>Ton nom ou raison sociale, ton numéro d'identification si tu en as un, la date, le détail de la prestation, le montant, et les conditions de paiement (acompte, solde).</p>
+      <h3>Droit à l'image et données du commerçant</h3>
+      <p>Les informations affichées sur la carte viennent de sources publiques (OpenStreetMap, collecte manuelle). Tout commerçant peut demander le retrait de sa fiche.</p>
+      <h3>Protection de tes données personnelles</h3>
+      <p>Ne partage jamais tes identifiants ou clés d'accès à l'application. Change ton mot de passe régulièrement.</p>
+    </div>
+  </section>
 
   <section id="ecran-plan" class="ecran-plein" hidden>
     <button id="btn-fermer-plan" class="btn-fermer" aria-label="Fermer">✕</button>
@@ -79,6 +114,7 @@
         <span id="count-aucun">0</span> aucun site détecté
         <span id="count-social">0</span> avec site
       </div>
+      <button id="btn-partager-carte" class="bouton-secondaire" hidden>Partager (9:16)</button>
     </div>
   </section>
 

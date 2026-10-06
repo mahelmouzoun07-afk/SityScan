@@ -6,9 +6,14 @@ function appliquerEtatConnecte(session) {
   utilisateurActuel = session?.user || null;
 
   const btnCompte = document.getElementById("btn-compte");
+  const btnProfil = document.getElementById("btn-profil");
   if (!btnCompte) return;
 
-  btnCompte.textContent = utilisateurActuel ? utilisateurActuel.email : "Mon compte";
+  btnCompte.hidden = !!utilisateurActuel;
+  if (btnProfil) {
+    btnProfil.hidden = !utilisateurActuel;
+    if (utilisateurActuel) btnProfil.textContent = utilisateurActuel.email;
+  }
 }
 
 export function getUtilisateurActuel() {
