@@ -25,64 +25,76 @@ function normaliser(texte) {
     .replace(/[\u0300-\u036f]/g, "");
 }
 
-export function initRechercheVille({ onVilleChoisie }) {
+let callbackVilleChoisie = null;
+
+export async function ouvrirRechercheVille() {
   const ecran = document.getElementById("recherche-ville");
   const input = document.getElementById("input-ville");
   const liste = document.getElementById("liste-suggestions");
   const message = document.getElementById("message-recherche");
-  const btnOuvrir = document.getElementById("btn-commencer");
-  const btnFermer = document.getElementById("btn-fermer-recherche");
 
-  function appliquerFiltre() {
-    const requete = normaliser(input.value.trim());
-    liste.innerHTML = "";
+  ecran.hidden = false;
+  input.value = "";
+  input.disabled = true;
+  liste.innerHTML = "";
+  message.textContent = "Chargement des villes…";
+  input.focus();
 
-    if (!requete) {
-      message.textContent = villesDisponibles.length
-        ? `${villesDisponibles.length} ville${villesDisponibles.length > 1 ? "s" : ""} disponible${villesDisponibles.length > 1 ? "s" : ""} pour l'instant.`
-        : "Aucune ville disponible pour l'instant.";
-      return;
-    }
+  await chargerVilles();
+  input.disabled = false;
+  input.focus();
+  appliquerFiltreInterne();
+}
 
-    const resultats = villesDisponibles.filter((v) =>
-      normaliser(v.ville).includes(requete)
-    );
+function appliquerFiltreInterne() {
+  const input = document.getElementById("input-ville");
+  const liste = document.getElementById("liste-suggestions");
+  const message = document.getElementById("message-recherche");
+  const ecran = document.getElementById("recherche-ville");
 
-    if (resultats.length === 0) {
-      message.textContent = "Cette ville n'est pas encore couverte.";
-      return;
-    }
+  const requete = normaliser(input.value.trim());
+  liste.innerHTML = "";
 
-    message.textContent = "";
-
-    for (const { ville, pays } of resultats) {
-      const li = document.createElement("li");
-      li.textContent = pays ? `${ville} — ${pays}` : ville;
-      li.addEventListener("click", () => {
-        ecran.hidden = true;
-        onVilleChoisie(ville);
-      });
-      liste.appendChild(li);
-    }
+  if (!requete) {
+    message.textContent = villesDisponibles.length
+      ? `${villesDisponibles.length} ville${villesDisponibles.length > 1 ? "s" : ""} disponible${villesDisponibles.length > 1 ? "s" : ""} pour l'instant.`
+      : "Aucune ville disponible pour l'instant.";
+    return;
   }
 
-  btnOuvrir.addEventListener("click", async () => {
-    ecran.hidden = false;
-    input.value = "";
-    input.disabled = true;
-    liste.innerHTML = "";
-    message.textContent = "Chargement des villes…";
-    input.focus();
+  const resultats = villesDisponibles.filter((v) => normaliser(v.ville).includes(requete));
 
-    await chargerVilles();
-    input.disabled = false;
-    input.focus();
-    appliquerFiltre();
-  });
+  if (resultats.length === 0) {
+    message.textContent = "Cette ville n'est pas encore couverte.";
+    return;
+  }
+
+  message.textContent = "";
+
+  for (const { ville, pays } of resultats) {
+    const li = document.createElement("li");
+    li.textContent = pays ? `${ville} — ${pays}` : ville;
+    li.addEventListener("click", () => {
+      ecran.hidden = true;
+      if (callbackVilleChoisie) callbackVilleChoisie(ville);
+    });
+    liste.appendChild(li);
+  }
+}
+
+export function initRechercheVille({ onVilleChoisie }) {
+  callbackVilleChoisie = onVilleChoisie;
+
+  const input = document.getElementById("input-ville");
+  const btnFermer = document.getElementById("btn-fermer-recherche");
+  const btnAutreVille = document.getElementById("btn-autre-ville");
 
   btnFermer.addEventListener("click", () => {
-    ecran.hidden = true;
+    document.getElementById("recherche-ville").hidden = true;
   });
 
-  input.addEventListener("input", appliquerFiltre);
+  // "Autre ville" dans l'en-tête permet de rescanner sans repasser par le questionnaire
+  btnAutreVille.addEventListener("click", () => ouvrirRechercheVille());
+
+  input.addEventListener("input", appliquerFiltreInterne);
 }

@@ -12,6 +12,7 @@ import { initProfil, ouvrirProfil } from "./profil.js";
 import { initKitLegal } from "./kit-legal.js";
 import { initDevis, ouvrirDevis } from "./devis.js";
 import { telechargerCartePartage } from "./carte-partage.js";
+import { initOnboarding } from "./onboarding.js";
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -22,6 +23,7 @@ initModeTournage();
 initProfil();
 initKitLegal();
 initDevis();
+initOnboarding();
 
 const map = new maplibregl.Map({
   container: "map",

@@ -465,3 +465,21 @@ footer a {
 
 .formulaire-app label { display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; color: #4a5670; }
 .formulaire-app textarea { padding: 12px 14px; border: 2px solid var(--marine); border-radius: 10px; font-family: var(--font-texte); resize: vertical; }
+
+.onboarding-progression { height: 4px; background: #e2e6ef; width: 100%; }
+.onboarding-progression-remplie { height: 100%; background: linear-gradient(90deg, var(--bleu), #6b94ff); transition: width 0.3s ease; }
+.onboarding-etape-label { font-family: var(--font-mono); font-size: 0.8rem; color: var(--bleu); font-weight: 700; }
+.onboarding-banniere { background: var(--marine); color: white; padding: 14px 18px; border-radius: 14px; margin: 14px 0; font-size: 0.95rem; }
+#onboarding-titre { font-family: var(--font-titre); font-size: 1.8rem; margin: 10px 0 20px; }
+
+.onboarding-grille-cartes { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.onboarding-carte { text-align: left; background: white; border: 1px solid #e2e6ef; border-radius: 16px; padding: 20px; cursor: pointer; display: flex; flex-direction: column; gap: 6px; font-family: var(--font-texte); }
+.onboarding-carte:hover { border-color: var(--bleu); }
+.onboarding-carte strong { font-family: var(--font-titre); font-size: 1.2rem; }
+.onboarding-emoji { font-size: 1.8rem; }
+
+.onboarding-slider-bloc { background: #f2f5ff; border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+.onboarding-slider-chiffre { font-family: var(--font-titre); font-size: 2.2rem; font-weight: 800; color: var(--bleu); margin-bottom: 14px; }
+.onboarding-slider-chiffre small { font-size: 1rem; font-weight: 400; color: #4a5670; }
+.onboarding-slider-bloc input[type="range"] { width: 100%; }
+.onboarding-slider-bornes { display: flex; justify-content: space-between; font-size: 0.75rem; color: #7b849c; margin-top: 4px; }
