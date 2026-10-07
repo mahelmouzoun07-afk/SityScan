@@ -70,7 +70,28 @@ export function initGenerateur() {
   });
 
   document.getElementById("btn-modifier-site").addEventListener("click", () => {
-    alert("Modification du texte, des prestations et des photos — fonctionnalité à construire ensuite.");
+    document.getElementById("input-modif-accroche").value = donneesActuelles.accroche || "";
+    document.getElementById("input-modif-apropos").value = donneesActuelles.texteApropos || `${commerceActuel.nom} vous accueille à ${commerceActuel.quartier || commerceActuel.ville}. Qualité et service au rendez-vous.`;
+    document.getElementById("input-modif-photo").value = donneesActuelles.photoPrincipale || "";
+    document.getElementById("ecran-modifier-site").hidden = false;
+  });
+
+  document.getElementById("btn-fermer-modifier").addEventListener("click", () => {
+    document.getElementById("ecran-modifier-site").hidden = true;
+  });
+
+  document.getElementById("form-modifier-site").addEventListener("submit", (e) => {
+    e.preventDefault();
+    donneesActuelles = {
+      ...donneesActuelles,
+      accroche: document.getElementById("input-modif-accroche").value.trim() || donneesActuelles.accroche,
+      texteApropos: document.getElementById("input-modif-apropos").value.trim(),
+      photoPrincipale: document.getElementById("input-modif-photo").value.trim() || donneesActuelles.photoPrincipale,
+    };
+    afficherApercu();
+    sauvegarderMaquette();
+    document.getElementById("ecran-modifier-site").hidden = true;
+    message.textContent = "Modifications enregistrées.";
   });
 
   document.getElementById("btn-mettre-en-ligne").addEventListener("click", () => {

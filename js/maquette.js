@@ -179,7 +179,8 @@ export function genererDonneesMaquette(commerce, styleIndex = null) {
 }
 
 export function rendreHtmlMaquette(donnees) {
-  const { nom, accroche, palette, quartier, ville, telephone, adresse, photoPrincipale, galerie } = donnees;
+  const { nom, accroche, palette, quartier, ville, telephone, adresse, photoPrincipale, galerie, texteApropos } = donnees;
+  const apropos = texteApropos || `${nom} vous accueille à ${quartier || ville}. Qualité et service au rendez-vous.`;
   const lienWhatsapp = telephone
     ? `https://wa.me/${telephone.replace(/[^0-9]/g, "")}`
     : null;
@@ -219,7 +220,7 @@ export function rendreHtmlMaquette(donnees) {
   </div>
   <div class="section">
     <h2>À propos</h2>
-    <p>${nom} vous accueille à ${quartier || ville}. Qualité et service au rendez-vous.</p>
+    <p>${apropos}</p>
   </div>
   <div class="section">
     <h2>Galerie</h2>

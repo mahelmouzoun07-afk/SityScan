@@ -462,3 +462,6 @@ footer a {
 /* Devis */
 .formulaire-app { display: flex; flex-direction: column; gap: 12px; max-width: 360px; }
 .formulaire-app input { padding: 12px 14px; border: 2px solid var(--marine); border-radius: 10px; font-family: var(--font-texte); }
+
+.formulaire-app label { display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; color: #4a5670; }
+.formulaire-app textarea { padding: 12px 14px; border: 2px solid var(--marine); border-radius: 10px; font-family: var(--font-texte); resize: vertical; }

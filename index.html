@@ -30,6 +30,23 @@
     <div id="profil-contenu" class="plan-contenu"></div>
   </section>
 
+  <section id="ecran-modifier-site" class="ecran-plein" hidden>
+    <button id="btn-fermer-modifier" class="btn-fermer" aria-label="Fermer">✕</button>
+    <h2>Modifier le site</h2>
+    <form id="form-modifier-site" class="formulaire-app">
+      <label>Accroche
+        <input type="text" id="input-modif-accroche" placeholder="Phrase d'accroche" />
+      </label>
+      <label>Texte « À propos »
+        <textarea id="input-modif-apropos" rows="4" placeholder="Présentation du commerce"></textarea>
+      </label>
+      <label>Photo principale (lien d'une image)
+        <input type="url" id="input-modif-photo" placeholder="https://..." />
+      </label>
+      <button type="submit" class="cta">Enregistrer et voir</button>
+    </form>
+  </section>
+
   <section id="ecran-devis" class="ecran-plein" hidden>
     <button id="btn-fermer-devis" class="btn-fermer" aria-label="Fermer">✕</button>
     <h2>Faire un devis</h2>
