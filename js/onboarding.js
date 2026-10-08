@@ -1,6 +1,7 @@
 import { supabase } from "./main.js";
 import { getUtilisateurActuel } from "./auth.js";
 import { ouvrirRechercheVille } from "./city.js";
+import { etatFlux } from "./etat-flux.js";
 
 const etat = {
   profil_type: null,
@@ -167,9 +168,11 @@ async function terminerOnboarding() {
       profil_type: etat.profil_type,
       competence_site: etat.competence_site,
       aisance_commerciale: etat.aisance_commerciale,
+      temps_semaine: etat.temps_semaine,
     }).eq("id", utilisateur.id);
   }
 
+  etatFlux.venantDeOnboarding = true;
   await ouvrirRechercheVille();
 }
 

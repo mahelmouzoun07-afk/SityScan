@@ -13,6 +13,8 @@ import { initKitLegal } from "./kit-legal.js";
 import { initDevis, ouvrirDevis } from "./devis.js";
 import { telechargerCartePartage } from "./carte-partage.js";
 import { initOnboarding } from "./onboarding.js";
+import { afficherResultatPlan, initResultatPlan } from "./resultat-plan.js";
+import { etatFlux } from "./etat-flux.js";
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -24,6 +26,7 @@ initProfil();
 initKitLegal();
 initDevis();
 initOnboarding();
+initResultatPlan();
 
 const map = new maplibregl.Map({
   container: "map",
@@ -77,6 +80,11 @@ initRechercheVille({
     const utilisateur = getUtilisateurActuel();
     if (utilisateur) {
       await supabase.from("profiles").update({ ville_cible: ville }).eq("id", utilisateur.id);
+    }
+
+    if (etatFlux.venantDeOnboarding) {
+      etatFlux.venantDeOnboarding = false;
+      await afficherResultatPlan(ville, total);
     }
   },
 });
